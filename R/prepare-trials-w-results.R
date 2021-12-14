@@ -1,5 +1,6 @@
 library(dplyr)
 library(readr)
+library(stringr)
 
 # Load reporting data -----------------------------------------------------
 
@@ -83,3 +84,6 @@ waldo::compare(old, trials_w_results_combined)
 old %>%
   filter(id == "tri01010") %>%
   waldo::compare(trials_w_results_combined)
+
+setdiff(old$id, trials_w_results$id)
+setdiff(trials_w_results$id, old$id)
