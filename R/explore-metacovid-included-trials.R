@@ -152,10 +152,17 @@ trials_w_full_interim_results <-
 # Are all full/interim results included metacovid sample?
 # 3 trials with full results are NOT included in metacovid sample: tri00107, tri00732, tri02562
 # 1 trial with interim result (and no full result) NOT included in metacovid sample: tri00084
+
+# tri00107/ChiCTR2000029381: non-english result publication (10.3760/cma.j.cn121430-20200406-00386)
+# tri00732/NCT04261517: non-english result publication (10.3785/j.issn.1008-9292.2020.03.03)
+# tri02562/NCT04332081: final version not accessible (10.22462/01.03.2020.1), but pre-proof found via semantic scholar: https://www.uhms.org/images/UHM-Journal/PRE-PROOF_-_HBO2_for_COVID_-_47-3_THIRD_QUARTER_2020_print_version_version_47-3.pdf
+# https://www.semanticscholar.org/paper/Hyperbaric-oxygen-therapy-for-COVID-19-patients-Gorenstein-Castellano/fc4bab1af1dfe771cac56ad2c5b42df67096f6c6
+# tri00084/ChiCTR2000029542: application note of ~1000 words (10.1093/jmcb/mjaa014)
 anti_join(trials_w_full_interim_results, metacovid_trials, by = "id")
 
 # What trials are included but don't have full results?
 # 1 trial does not have full or interim results but IS included in metacovid sample: tri02189 (other)
+# tri02189/NCT04399746: "other" is actually journal article (https://www.biomedres.info/biomedical-research/effects-of-ivermectinazithromycincholecalciferol-combined-therapy-on-covid19-infected-patients-a-proof-of-concept-study-14435.html)
 anti_join(metacovid_trials, trials_w_full_interim_results, by = "id")
 
 # If limit to interim, 5 trials
@@ -170,3 +177,15 @@ trials_w_results_combined %>%
   select(id, starts_with("pub_type")) %>%
   pull(id) %>%
   cat(sep = ", ")
+
+
+# Explore metacovid trial completion dates --------------------------------
+
+metacovid_trials %>%
+  # select(starts_with("rcd")|starts_with("pcd")|starts_with("scd"))
+  summarize(
+    min_rcd_auto = min(rcd_auto, na.rm = TRUE),
+    max_rcd_auto = max(rcd_auto, na.rm = TRUE),
+    min_rcd_manual = min(rcd_manual, na.rm = TRUE),
+    max_rcd_manual = max(rcd_manual, na.rm = TRUE)
+  )
