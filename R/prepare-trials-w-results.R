@@ -31,10 +31,15 @@ registrations <-
 # Results for all trials with any result
 # 1 row per trial (wide)
 
-results <-
+# Limit to results in trials dataset (because some results from trials with no database id)
+results_from_trials <-
   all_results %>%
-  # Limit to results in trials dataset
-  semi_join(trials_w_results, by = "id") %>%
+
+  semi_join(trials_w_results, by = "id")
+
+results <-
+
+  results_from_trials %>%
 
   select(-trn, -search_type, -search_engine, comments_results = comments) %>%
 
