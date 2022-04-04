@@ -30,7 +30,7 @@ n_all_results <- nrow(results_from_trials)
   # tidyr::drop_na() %>% 
   # nrow()
 
-# Recode results
+# Recode results: some "other" results are preprints/articles, and vice-versa
 recoded_results <-
   results_from_trials %>% 
   mutate(pub_type =
@@ -38,8 +38,16 @@ recoded_results <-
              # tri00084/ChiCTR2000029542: application note of ~1000 words (10.1093/jmcb/mjaa014)
              id == "tri00084" ~ "other",
              
-             # tri02189/NCT04399746: "other" is actually journal article (https://www.biomedres.info/biomedical-research/effects-of-ivermectinazithromycincholecalciferol-combined-therapy-on-covid19-infected-patients-a-proof-of-concept-study-14435.html)
+             # tri02189/NCT04399746: "other" --> "journal article" (https://www.biomedres.info/biomedical-research/effects-of-ivermectinazithromycincholecalciferol-combined-therapy-on-covid19-infected-patients-a-proof-of-concept-study-14435.html)
              id == "tri02189" ~ "full_results_journal_article",
+             
+             # tri00739/NCT04315480: "other" --> "journal article"
+             id == "tri00739" & doi == "10.1101/2020.07.11.20151365" ~ "journal_article",
+             
+             # tri01886/NCT04340050": "other" --> "preprint" and "journal article"
+             id == "tri01886" & doi == "10.1101/2020.06.21.20132944" ~ "preprint",
+             id == "tri01886" & doi == "10.1111/joim.13185" ~ "journal_article",
+             
              TRUE ~ pub_type
            )
   )
@@ -111,7 +119,7 @@ write_csv(trials_w_results_combined, paste0(dir_data, "/metacovid-trials.csv"))
 
 ## Study selection
 
-The source dataset included `r n_direcct_trials` trials. We excluded `r n_direcct_trials - n_trials_w_results` trials without results. For the `r n_trials_w_results` trials with results, we screened all `r n_all_results` results to verify the publication types. We found one result (trial: NCT04399746) denoted as "other" in the source dataset which was actually a full-results journal article, and one result (trial: ChiCTR2000029542) denoted as a "full-results journal article" in the source dataset which was a "application note" and which we recoded as "other." After recoding these two results, we then excluded all summary results (n = `r n_summary_results`) and other results (n = `r n_other_results`), which included grey literature, conference abstracts and presentations, research letters and notes, etc. We also excluded two non-English results (trials: ChiCTR2000029381 and NCT04261517) and one result for which we could not access the full-text publication (trial: NCT04332081). Our analysis dataset comprised `r n_metacovid_trials` trials with `r n_screened_results` results.
+The source dataset included `r n_direcct_trials` trials. We excluded `r n_direcct_trials - n_trials_w_results` trials without results. For the `r n_trials_w_results` trials with results, we screened all `r n_all_results` results to verify the publication types in order to ensure exclusion of "other" results beyond journal articles and preprints, such as grey literature, conference abstracts and presentations, research letters and notes, etc. We recoded an "application note" from a "journal article" to an "other" result (ChiCTR2000029542: 10.1093/jmcb/mjaa014). We recoded 3 "other" results to "journal article" (NCT04399746: no DOI; NCT04315480: 10.1101/2020.07.11.20151365; NCT04340050: 10.1111/joim.13185) and 1 to "preprint" (NCT04340050: 10.1101/2020.06.21.20132944). After recoding these results, we then excluded all summary results (n = `r n_summary_results`) and other results (n = `r n_other_results`). We also excluded two non-English results (trials: ChiCTR2000029381 and NCT04261517) and one result for which we could not access the full-text publication (trial: NCT04332081). Our analysis dataset comprised `r n_metacovid_trials` trials with `r n_screened_results` results.
 
 ## Screening criteria
 
